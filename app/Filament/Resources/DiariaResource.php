@@ -119,16 +119,7 @@ class DiariaResource extends Resource
                                         'Outros' => 'Outros',
                                     ])
                                     ->required(),
-                                Forms\Components\TextInput::make('orgao_setor_lotacao')
-                                    ->label('Órgão/Setor de Lotação (para terceiros)')
-                                    ->visible(fn(Forms\Get $get) => $get('tipo_solicitante') === 'Terceiros')
-                                    ->maxLength(255)
-                                    ->required()
-                                    ->columnSpan([
-                                        'sm' => 1,
-                                        'md' => 2,
-                                        'xl' => 2,
-                                    ]),
+                                
                             ])
                             ->columns([
                                 'sm' => 1,
@@ -162,7 +153,16 @@ class DiariaResource extends Resource
                                         'xl' => 2,
                                     ]),
 
-
+                                Forms\Components\TextInput::make('orgao_setor_lotacao')
+                                    ->label('Órgão/Setor de Lotação (para terceiros)')
+                                    ->visible(fn(Forms\Get $get) => $get('tipo_solicitante') === 'Terceiros')
+                                    ->maxLength(255)
+                                    ->required()
+                                    ->columnSpan([
+                                        'sm' => 1,
+                                        'md' => 2,
+                                        'xl' => 2,
+                                    ]),
                                 Forms\Components\TextInput::make('siape')
                                     ->label('SIAPE')
                                     ->visible(fn(Forms\Get $get) => $get('tipo_solicitante') === 'Própria')
@@ -269,7 +269,7 @@ class DiariaResource extends Resource
                                     ->required()
                                     ->options([
                                         'Diárias' => 'Diárias',
-                                        'Diárias e Passagens' => 'Diárias e Passagens',
+                                        'Diárias e Passagens Aérea' => 'Diárias e Passagens Aérea',
                                     ])                                    
                                     ->columnSpan([
                                         'sm' => 1,
@@ -467,7 +467,16 @@ class DiariaResource extends Resource
                                
 
                                 Forms\Components\Toggle::make('ciente_diaria')
-                                    ->label('Ciente dos Termos para Solicitação de Diária')                                    
+                                    ->label('Declaro estar ciente de que, para o cadastro da diária, é necessário o envio deste formulário assinado junto aos documento comprobatórios da viagem (convite, ofício, comprovante de inscrição, etc.) para o e-mail gabinete@garanhuns.ifpe.edu.br.')                                    
+                                    ->inline()                                 
+                                    ->required()
+                                    ->columnSpan([
+                                        'sm' => 1,
+                                        'md' => 2,
+                                    ]),
+                                Forms\Components\Toggle::make('ciente_normativo')
+                                    ->label('Declaro estar ciente dos prazos e obrigações dispostos no DECRETO Nº 5.992, DE 19 DE DEZEMBRO DE 2006 e na PORTARIA REI/IFPE Nº 50 DE 13 DE JANEIRO DE 2020.')                                    
+                                    ->inline()                                 
                                     ->required()
                                     ->columnSpan([
                                         'sm' => 1,
@@ -478,36 +487,13 @@ class DiariaResource extends Resource
                                 'sm' => 1,
                                 'md' => 2,
                             ]),
-                        Forms\Components\Tabs\Tab::make('Prestação de Contas')
-                            ->schema([
-                                Forms\Components\Toggle::make('prestacao_contas')
-                                    ->label('Prestação de Contas')
-                                    ->onColor('success')
-                                    ->offColor('secondary')
-                                    ->nullable(),
-                                Forms\Components\DatePicker::make('data_prestacao_contas')
-                                    ->label('Data da Prestação de Contas')
-                                    ->nullable(),
-                                Forms\Components\Textarea::make('descricao_prestacao_contas')
-                                    ->label('Descrição da Prestação de Contas')
-                                    ->rows(3)
-                                    ->maxLength(1000)
-                                    ->nullable(),
-                                Forms\Components\Textarea::make('justificativa_atraso_prestacao_contas')
-                                    ->label('Justificativa para Atraso na Prestação de Contas')
-                                    ->rows(3)
-                                    ->maxLength(1000)
-                                    ->nullable(),
-                                Forms\Components\Toggle::make('ciente_prestacao_contas')
-                                    ->label('Ciente dos Termos para Prestação de Contas')
-                                    ->onColor('success')
-                                    ->offColor('secondary')
-                                    ->nullable(),
-                            ])
-                            ->columns(2),
-                    ])
+                        
+                    
+                    ])->columnSpanFull(),
+                    Forms\Components\ViewField::make('decreto_link')
+                    ->view('filament.forms.components.decreto-link')
                     ->columnSpanFull(),
-            ]);
+                ]);
     }
 
     public static function table(Table $table): Table

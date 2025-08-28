@@ -52,6 +52,7 @@ class Diaria extends Model
         'local_evento',
         'justificativa_05_dias_evento',
         'ciente_diaria',
+        'ciente_normativo',
         'prestacao_contas', 
         'data_prestacao_contas', 
         'descricao_prestacao_contas', 
