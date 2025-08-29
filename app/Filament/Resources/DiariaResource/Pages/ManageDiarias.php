@@ -18,7 +18,12 @@ class ManageDiarias extends ManageRecords
             Actions\CreateAction::make()
                 ->label('Solicitar Diária')                
                 ->icon('heroicon-o-plus')
-                ->modalHeading('Criar Diária'),
+                ->modalHeading('Criar Diária')
+                ->after(function ($record) {
+                   $record->user_id = auth()->user()->id;
+                   $record->status = 'Entragar Documentos';
+                   $record->save();
+                }),
                 
         ];
     }

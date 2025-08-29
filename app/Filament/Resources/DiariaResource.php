@@ -35,6 +35,9 @@ class DiariaResource extends Resource
                     ->tabs([
                         Forms\Components\Tabs\Tab::make('Dados Pessoais')
                             ->schema([
+                                Forms\Components\Hidden::make('user_id')
+                                    ->default(fn () => auth()->user()->id)
+                                    ->required(),
                                 Forms\Components\ToggleButtons::make('tipo_solicitante')
                                     ->label('Tipo de Solicitante')
                                     ->options([
@@ -52,7 +55,7 @@ class DiariaResource extends Resource
                                     ->default('Própria')
                                     ->inline()
                                     ->live()
-                                    ->columnSpanFull()
+                                    //->columnSpanFull()
                                     ->required(),
 
                                 Forms\Components\TextInput::make('nome')
@@ -68,15 +71,7 @@ class DiariaResource extends Resource
                                     ->label('CPF')
                                     ->required()
                                     ->maxLength(14)
-                                    ->mask('000.000.000-00'),
-                                Forms\Components\TextInput::make('rg')
-                                    ->label('RG')
-                                    ->required()
-                                    ->maxLength(20),
-                                Forms\Components\TextInput::make('orgao_expedidor')
-                                    ->label('Órgão Expedidor')
-                                    ->required()
-                                    ->maxLength(50),
+                                    ->mask('999.999.999-99'),                                
                                 Forms\Components\DatePicker::make('data_nascimento')
                                     ->required()
                                     ->label('Data de Nascimento'),
@@ -84,7 +79,7 @@ class DiariaResource extends Resource
                                     ->label('Telefone')
                                     ->required()
                                     ->maxLength(15)
-                                    ->mask('(00) 00000-0000'),
+                                    ->mask('(99) 99999-9999'),
                                 Forms\Components\TextInput::make('email')
                                     ->label('E-mail')
                                     ->email()
@@ -110,16 +105,7 @@ class DiariaResource extends Resource
                                     ->label('Conta Corrente')
                                     ->required()
                                     ->maxLength(20),
-                                Forms\Components\Select::make('tipo_conta')
-                                    ->label('Tipo de Conta')
-                                    ->options([
-                                        'Corrente' => 'Corrente',
-                                        'Poupança' => 'Poupança',
-                                        'Salário' => 'Salário',
-                                        'Outros' => 'Outros',
-                                    ])
-                                    ->required(),
-                                
+
                             ])
                             ->columns([
                                 'sm' => 1,
@@ -194,7 +180,7 @@ class DiariaResource extends Resource
                                         'Fundamental' => 'Fundamental',
                                         'Médio' => 'Médio',
                                         'Superior' => 'Superior',
-                                    ])                                    
+                                    ])
                                     ->columnSpan([
                                         'sm' => 1,
                                         'md' => 1,
@@ -238,7 +224,7 @@ class DiariaResource extends Resource
                                     ->numeric()
                                     ->visible(fn(Forms\Get $get) => $get('auxilio_transporte') == true && $get('tipo_solicitante') === 'Terceiros')
                                     ->required()
-                                    ->prefix('R$')                                    
+                                    ->prefix('R$')
                                     ->columnSpan([
                                         'sm' => 1,
                                         'md' => 1,
@@ -247,7 +233,7 @@ class DiariaResource extends Resource
                                 Forms\Components\TextInput::make('valor_vale_alimentacao')
                                     ->label('Valor do Vale Alimentação')
                                     ->numeric()
-                                     ->visible(fn(Forms\Get $get) => $get('auxilio_transporte') == true && $get('tipo_solicitante') === 'Terceiros')
+                                    ->visible(fn(Forms\Get $get) => $get('auxilio_transporte') == true && $get('tipo_solicitante') === 'Terceiros')
                                     ->prefix('R$')
                                     ->required()
                                     ->columnSpan([
@@ -270,14 +256,14 @@ class DiariaResource extends Resource
                                     ->options([
                                         'Diárias' => 'Diárias',
                                         'Diárias e Passagens Aérea' => 'Diárias e Passagens Aérea',
-                                    ])                                    
+                                    ])
                                     ->columnSpan([
                                         'sm' => 1,
                                         'md' => 2,
                                     ]),
 
                                 Forms\Components\DateTimePicker::make('data_hora_saida')
-                                    ->label('Data e Hora de Saída')                                   
+                                    ->label('Data e Hora de Saída')
                                     ->required()
                                     ->columnSpan([
                                         'sm' => 1,
@@ -327,7 +313,7 @@ class DiariaResource extends Resource
                                         'sm' => 1,
                                         'md' => 1,
                                     ]),
-                                 Forms\Components\ToggleButtons::make('tipo_intinerario')
+                                Forms\Components\ToggleButtons::make('tipo_intinerario')
                                     ->label('Tipo de Itinerário')
                                     ->grouped()
                                     ->required()
@@ -344,7 +330,17 @@ class DiariaResource extends Resource
                                         0 => 'heroicon-o-sun',
                                         1 => 'heroicon-o-moon',
                                     ])
-                                    ->columnSpanFull(),                    
+                                    ->afterStateUpdated(function ($state, Forms\Set $set) {
+                                        if ($state == 1) {
+                                            \Filament\Notifications\Notification::make()
+                                                ->title('Atenção!')
+                                                ->body('Para Múltiplos Locais (com pernoites), considere que os pernoites são em cidades diferentes da sede do evento.')
+                                                ->danger()
+                                                ->persistent()
+                                                ->send();
+                                        }
+                                    })
+                                    ->columnSpanFull(),
 
                                 Forms\Components\Repeater::make('intinerario')
                                     ->label('Itinerário da Viagem com Pernoites')
@@ -364,7 +360,7 @@ class DiariaResource extends Resource
                                         'sm' => 1,
                                         'md' => 2,
                                     ])
-                                    ->columnSpanFull(),                                    
+                                    ->columnSpanFull(),
                                 Forms\Components\Select::make('transporte_ida')
                                     ->label('Transporte de Ida')
                                     ->options([
@@ -374,7 +370,7 @@ class DiariaResource extends Resource
                                         'Rodoviário' => 'Rodoviário',
                                         'Trem' => 'Trem',
                                         'Carro Oficial + Aéreo' => 'Carro Oficial + Aéreo',
-                                        'Carro Oficial + Carro Próprio' => 'Carro Oficial + Carro Próprio',                                        
+                                        'Carro Oficial + Carro Próprio' => 'Carro Oficial + Carro Próprio',
                                         'Carro Oficial + Rodoviário' => 'Carro Oficial + Rodoviário',
                                         'Carro Oficial + Trem' => 'Carro Oficial + Trem',
                                     ])
@@ -388,11 +384,12 @@ class DiariaResource extends Resource
                                     ->options([
                                         'Carro Oficial' => 'Carro Oficial',
                                         'Carro Próprio' => 'Carro Próprio',
-                                        'Aéreo' => 'Aéreo',     
+                                        'Aéreo' => 'Aéreo',
                                         'Rodoviário' => 'Rodoviário',
                                         'Trem' => 'Trem',
                                         'Carro Oficial + Aéreo' => 'Carro Oficial + Aéreo   
-',                                     'Carro Oficial + Carro Próprio' => 'Carro Oficial + Carro Próprio',                                       
+',
+                                        'Carro Oficial + Carro Próprio' => 'Carro Oficial + Carro Próprio',
                                         'Carro Oficial + Rodoviário' => 'Carro Oficial + Rodoviário',
                                         'Carro Oficial + Trem' => 'Carro Oficial + Trem',
                                     ])
@@ -464,43 +461,74 @@ class DiariaResource extends Resource
                                         'md' => 2,
                                     ]),
 
-                               
 
-                                Forms\Components\Toggle::make('ciente_diaria')
-                                    ->label('Declaro estar ciente de que, para o cadastro da diária, é necessário o envio deste formulário assinado junto aos documento comprobatórios da viagem (convite, ofício, comprovante de inscrição, etc.) para o e-mail gabinete@garanhuns.ifpe.edu.br.')                                    
-                                    ->inline()                                 
-                                    ->required()
-                                    ->columnSpan([
-                                        'sm' => 1,
-                                        'md' => 2,
-                                    ]),
-                                Forms\Components\Toggle::make('ciente_normativo')
-                                    ->label('Declaro estar ciente dos prazos e obrigações dispostos no DECRETO Nº 5.992, DE 19 DE DEZEMBRO DE 2006 e na PORTARIA REI/IFPE Nº 50 DE 13 DE JANEIRO DE 2020.')                                    
-                                    ->inline()                                 
-                                    ->required()
-                                    ->columnSpan([
-                                        'sm' => 1,
-                                        'md' => 2,
-                                    ]),
+
+                                Forms\Components\Fieldset::make('Declarações')
+                                    ->schema([
+                                        Forms\Components\Toggle::make('ciente_diaria')
+                                            ->label('Declaro estar ciente de que, para o cadastro da diária, é necessário o envio deste formulário assinado junto aos documento comprobatórios da viagem (convite, ofício, comprovante de inscrição, etc.) para o e-mail gabinete@garanhuns.ifpe.edu.br.')
+                                            ->inline()
+                                            ->required()
+                                            ->columnSpan([
+                                                'sm' => 1,
+                                                'md' => 2,
+                                            ]),
+                                        Forms\Components\Toggle::make('ciente_normativo')
+                                            ->label('Declaro estar ciente dos prazos e obrigações dispostos no DECRETO Nº 5.992, DE 19 DE DEZEMBRO DE 2006 e na PORTARIA REI/IFPE Nº 50 DE 13 DE JANEIRO DE 2020.')
+                                            ->inline()
+                                            ->required()
+                                            ->columnSpan([
+                                                'sm' => 1,
+                                                'md' => 2,
+                                            ]),
+                                        Forms\Components\ViewField::make('decreto_link')
+                                            ->view('filament.forms.components.decreto-link')
+                                            ->columnSpanFull(),
+                                    ])
+                                    ->columnSpanFull(),
                             ])
                             ->columns([
                                 'sm' => 1,
                                 'md' => 2,
                             ]),
-                        
-                    
+
+
                     ])->columnSpanFull(),
-                    Forms\Components\ViewField::make('decreto_link')
-                    ->view('filament.forms.components.decreto-link')
-                    ->columnSpanFull(),
-                ]);
+
+            ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                //
+                Tables\Columns\TextColumn::make('id')->label('ID')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('nome')->label('Nome')->sortable()->searchable()->limit(20),
+                Tables\Columns\TextColumn::make('tipo_solicitante')->label('Tipo de Solicitante')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('siape')->label('SIAPE')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('data_hora_saida')
+                    ->label('Data e Hora de Saída')
+                    ->dateTime('d/m/Y H:i')
+                    ->sortable()
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('data_hora_retorno')
+                    ->label('Data e Hora de Retorno')
+                    ->dateTime('d/m/Y H:i')
+                    ->sortable()
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('estado.nome')->label('Estado')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('cidade.nome')->label('Cidade')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('finalidade_viagem')->label('Finalidade da Viagem')->sortable()->searchable()->limit(20),                
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label('Criado em')
+                    ->dateTime('d/m/Y H:i')
+                    ->sortable()
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->label('Atualizado em')
+                    ->dateTime('d/m/Y H:i')
+                    ->sortable()
+                    ->searchable(),
             ])
             ->filters([
                 //

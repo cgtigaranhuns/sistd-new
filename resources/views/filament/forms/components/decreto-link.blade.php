@@ -1,6 +1,6 @@
 <div class="mb-4">
     <label class="block text-sm font-medium text-gray-700">
-        Link do Decreto e da Portaria:
+        Link: Decretos e Portarias:
     </label>
     <div class="flex items-center space-x-2 mb-1">
         <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -20,6 +20,16 @@
            target="_blank"
            class="text-blue-600 hover:underline">
             PORTARIA Nº 47 DE 13 DE JANEIRO DE 2020
+        </a>
+    </div>
+    <div class="flex items-center space-x-2">
+        <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+        </svg>
+        <a href="https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2023/decreto/d11872.htm"
+           target="_blank"
+           class="text-blue-600 hover:underline">
+            DECRETO Nº 11.872, DE 29 DE DEZEMBRO DE 2023
         </a>
     </div>
 </div>
